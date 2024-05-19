@@ -37,11 +37,14 @@ func main() {
 	// Handlers initialization
 	recordStore := db.NewMongoRecordStore(conn)
 	recordHandler := handlers.NewRecordHandler(recordStore)
+	inMemHandler := handlers.NewInMemoryHandler(map[string]string{})
 
 	// Routes
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/records", recordHandler.HandleGetRecords)
+	mux.HandleFunc("/data", inMemHandler.HandlePostData)
+	mux.HandleFunc("/data/get/", inMemHandler.HandleGetData)
 
 	srv.Handler = mux
 
