@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/FerMusicComposer/totalcoder-challenge1/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,7 +13,7 @@ import (
 const recordColl = "records"
 
 type RecordStore interface {
-	GetRecordsByFilter(context.Context, bson.M) ([]models.Record, error)
+	GetRecordsByFilter(context.Context, time.Time, time.Time, int, int) ([]models.Record, error)
 }
 
 type MongoRecordStore struct {
@@ -27,14 +28,31 @@ func NewMongoRecordStore(conn *MongoConnection) *MongoRecordStore {
 	}
 }
 
-func (s *MongoRecordStore) GetRecordsByFilter(ctx context.Context, filter bson.M) ([]models.Record, error) {
+func (s *MongoRecordStore) GetRecordsByFilter(ctx context.Context, startDate, endDate time.Time, minCount, maxCount int) ([]models.Record, error) {
 	records := []models.Record{}
-	fmt.Println("received filter:", filter)
-	cursor, err := s.coll.Find(ctx, filter)
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.M{
+			"createdAt": bson.M{
+				"$gte": startDate.Format(time.RFC3339),
+				"$lte": endDate.Format(time.RFC3339),
+			},
+		},
+		}},
+		{{Key: "$addFields", Value: bson.M{"totalCount": bson.M{"$sum": "$count"}}}},
+		{{Key: "$match", Value: bson.M{
+			"totalCount": bson.M{
+				"$gte": minCount,
+				"$lte": maxCount},
+		},
+		}},
+	}
+
+	fmt.Println("pipeline:", pipeline)
+	cursor, err := s.coll.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
-	// defer cursor.Close(ctx)
+	defer cursor.Close(ctx)
 
 	if err := cursor.All(ctx, &records); err != nil {
 		return nil, err

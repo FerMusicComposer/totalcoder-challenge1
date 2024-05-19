@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/FerMusicComposer/totalcoder-challenge1/db"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type RecordHandler struct {
@@ -51,18 +50,7 @@ func (rh *RecordHandler) HandleGetRecords(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	filter := bson.M{
-		"date": bson.M{
-			"$gte": startDate,
-			"$lte": endDate,
-		},
-		// "count": bson.M{
-		// 	"$gte": req.MinCount,
-		// 	"$lte": req.MaxCount,
-		// },
-	}
-
-	records, err := rh.recordStore.GetRecordsByFilter(r.Context(), filter)
+	records, err := rh.recordStore.GetRecordsByFilter(r.Context(), startDate, endDate, req.MinCount, req.MaxCount)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
