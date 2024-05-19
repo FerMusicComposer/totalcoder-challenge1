@@ -7,6 +7,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const (
+	MONGOURI = "mongodb://localhost:27017"
+	DBNAME   = "records-db"
+)
+
 type MongoConnection struct {
 	Client       *mongo.Client
 	Database     *mongo.Database
