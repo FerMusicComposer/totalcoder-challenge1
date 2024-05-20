@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/FerMusicComposer/totalcoder-challenge1/utils"
 )
 
 type InMemoryHandler struct {
@@ -19,6 +21,7 @@ func NewInMemoryHandler(store map[string]string) *InMemoryHandler {
 
 func (mh *InMemoryHandler) HandlePostData(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		fmt.Println(utils.NotAllowed.From("HandlePostData => method not allowed", nil).Err)
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
@@ -26,26 +29,31 @@ func (mh *InMemoryHandler) HandlePostData(w http.ResponseWriter, r *http.Request
 	req := make(map[string]string)
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		fmt.Println(utils.BadRequest.From("HandlePostData => error reading request body", err).Err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	if err := json.Unmarshal(body, &req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		fmt.Println(utils.BadRequest.From("HandlePostData => error parsing request body", err).Err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	key, okKey := req["key"]
 	value, okValue := req["value"]
 	if !okKey || !okValue {
-		http.Error(w, "Invalid payload", http.StatusBadRequest)
+		fmt.Println(utils.InvalidPayload.From("HandlePostData => invalid payload", nil).Err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	mh.store[key] = value
 	fmt.Println("Data saved:", mh.store)
+
 	jsonResp, err := json.Marshal(req)
 	if err != nil {
+		fmt.Println(utils.Internal.From("HandleGetData => error marshalling data", err).Err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -56,6 +64,7 @@ func (mh *InMemoryHandler) HandlePostData(w http.ResponseWriter, r *http.Request
 
 func (mh *InMemoryHandler) HandleGetData(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
+		fmt.Println(utils.NotAllowed.From("HandleGetData => method not allowed", nil).Err)
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
@@ -64,6 +73,7 @@ func (mh *InMemoryHandler) HandleGetData(w http.ResponseWriter, r *http.Request)
 	fmt.Println("Key received:", key)
 	value, ok := mh.store[key]
 	if !ok {
+		fmt.Println(utils.NotFound.From("HandleGetData => key not found", nil).Err)
 		http.Error(w, "Key not found", http.StatusNotFound)
 		return
 	}
@@ -75,6 +85,7 @@ func (mh *InMemoryHandler) HandleGetData(w http.ResponseWriter, r *http.Request)
 
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
+		fmt.Println(utils.Internal.From("HandleGetData => error marshalling data", err).Err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

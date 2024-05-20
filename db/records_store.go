@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/FerMusicComposer/totalcoder-challenge1/models"
@@ -47,7 +46,6 @@ func (s *MongoRecordStore) GetRecordsByFilter(ctx context.Context, startDate, en
 		}},
 	}
 
-	fmt.Println("pipeline:", pipeline)
 	cursor, err := s.coll.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
@@ -57,6 +55,6 @@ func (s *MongoRecordStore) GetRecordsByFilter(ctx context.Context, startDate, en
 	if err := cursor.All(ctx, &records); err != nil {
 		return nil, err
 	}
-	fmt.Println("records returned:", records)
+
 	return records, nil
 }
