@@ -15,3 +15,10 @@ REQUIREMENTS
 DELIVERABLES
 
 - public repo with clear instructions on configuration and running the application locally.
+
+# To run the project
+
+- have docker installed
+- run `docker-compose up -d`
+- open another shell and type air and enter
+- Done. The project should start and work just fine

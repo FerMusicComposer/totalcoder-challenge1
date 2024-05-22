@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/FerMusicComposer/totalcoder-challenge1/models"
@@ -28,12 +29,14 @@ func NewMongoRecordStore(conn *MongoConnection) *MongoRecordStore {
 }
 
 func (s *MongoRecordStore) GetRecordsByFilter(ctx context.Context, startDate, endDate time.Time, minCount, maxCount int) ([]models.Record, error) {
+	fmt.Printf("Running query with startDate=%s, endDate=%s, minCount=%d, maxCount=%d\n", startDate.Format(time.RFC3339), endDate.Format(time.RFC3339), minCount, maxCount)
+
 	records := []models.Record{}
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.M{
 			"createdAt": bson.M{
-				"$gte": startDate.Format(time.RFC3339),
-				"$lte": endDate.Format(time.RFC3339),
+				"$gte": startDate,
+				"$lte": endDate,
 			},
 		},
 		}},
@@ -56,5 +59,6 @@ func (s *MongoRecordStore) GetRecordsByFilter(ctx context.Context, startDate, en
 		return nil, err
 	}
 
+	fmt.Printf("Query returned %d records\n", len(records))
 	return records, nil
 }

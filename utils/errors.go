@@ -16,6 +16,7 @@ const (
 	errBadRequest
 	errNotAllowed
 	errInvalidPayload
+	errConnectionError
 )
 
 type AppError struct {
@@ -25,14 +26,15 @@ type AppError struct {
 }
 
 var (
-	InvalidDate    = AppError{ErrType: errInvalidDate, Code: -1}
-	Unauthorized   = AppError{ErrType: errUnauthorized, Code: 401}
-	Internal       = AppError{ErrType: errInternal, Code: 500}
-	NotFound       = AppError{ErrType: errNotFound, Code: 404}
-	Forbidden      = AppError{ErrType: errForbidden, Code: 403}
-	BadRequest     = AppError{ErrType: errBadRequest, Code: 400}
-	NotAllowed     = AppError{ErrType: errNotAllowed, Code: 405}
-	InvalidPayload = AppError{ErrType: errInvalidPayload, Code: 400}
+	InvalidDate     = AppError{ErrType: errInvalidDate, Code: -1}
+	Unauthorized    = AppError{ErrType: errUnauthorized, Code: 401}
+	Internal        = AppError{ErrType: errInternal, Code: 500}
+	NotFound        = AppError{ErrType: errNotFound, Code: 404}
+	Forbidden       = AppError{ErrType: errForbidden, Code: 403}
+	BadRequest      = AppError{ErrType: errBadRequest, Code: 400}
+	NotAllowed      = AppError{ErrType: errNotAllowed, Code: 405}
+	InvalidPayload  = AppError{ErrType: errInvalidPayload, Code: 400}
+	ConnectionError = AppError{ErrType: errConnectionError, Code: 500}
 )
 
 // =================
@@ -57,6 +59,8 @@ func (appErr AppError) Error() string {
 		return fmt.Sprintf("%d Method not allowed", appErr.Code)
 	case errInvalidPayload:
 		return fmt.Sprintf("%d Invalid payload", appErr.Code)
+	case errConnectionError:
+		return fmt.Sprintf("%d Connection error", appErr.Code)
 	default:
 		return "Unknown error"
 	}
