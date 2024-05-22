@@ -20,5 +20,6 @@ DELIVERABLES
 
 - have docker installed
 - run `docker-compose up -d`
-- open another shell and type air and enter
+- open another shell and type `air` and enter
 - Done. The project should start and work just fine
+- To stop the project run `docker-compose down` and then `ctrl+c` in the Air terminal
