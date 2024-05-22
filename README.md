@@ -23,3 +23,19 @@ DELIVERABLES
 - open another shell and type `air` and enter
 - Done. The project should start and work just fine
 - To stop the project run `docker-compose down` and then `ctrl+c` in the Air terminal
+
+# For Endpoint Testing
+
+- Use this to test the mongo handler:
+  {
+  "startDate": "2017-01-26",
+  "endDate": "2017-01-30",
+  "minCount": 100,
+  "maxCount": 5000
+  }
+
+- For the In Memory Post:
+  {
+  "key": "come-on-barbie",
+  "value": "lets-go-barbie"
+  }
